@@ -10,6 +10,14 @@
     grid-template-columns: auto;
 }
 
+main {
+    padding: 0 1em;
+    overflow: {
+        x: hidden;
+        y: auto;
+    }
+}
+
 nav {
     @include no-select;
 
@@ -29,4 +37,8 @@ button {
     border: none;
     background: inherit;
     cursor: pointer;
+
+    &:disabled {
+        cursor: initial;
+    }
 }

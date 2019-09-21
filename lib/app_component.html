@@ -1,24 +1,27 @@
 <div class="outermost">
     <main>
-        yeet
+        <router-outlet [routes]="Routes.routes"></router-outlet>
     </main>
 
     <nav>
         <span class="bottom-right">
-            <button class="next">
+            <button class="next" [disabled]="!canAdvance" (click)="advance()">
                 <span class="sr-only">Next</span>
-                <i class="material-icons md-36 md-light" aria-hidden="true">chevron_right</i>
+                <i class="material-icons md-36 md-light" [class.md-inactive]="!canAdvance"
+                    aria-hidden="true">chevron_right</i>
             </button>
         </span>
         <span class="bottom-left">
-            <button class="back">
+            <button class="back" [disabled]="!canRegress" (click)="regress()">
                 <span class="sr-only">Back</span>
-                <i class="material-icons md-36 md-light" aria-hidden="true">chevron_left</i>
+                <i class="material-icons md-36 md-light" [class.md-inactive]="!canRegress"
+                    aria-hidden="true">chevron_left</i>
             </button>
-            <button class="reset">
+            <button class="reset" (click)="reset()">
                 <span class="sr-only">Reset</span>
                 <i class="material-icons md-36 md-light" aria-hidden="true">refresh</i>
             </button>
         </span>
+        <span class="live sr-only" innerHtml="Page {{currentPage + 1}}" aria-live="assertive"></span>
     </nav>
 </div>
