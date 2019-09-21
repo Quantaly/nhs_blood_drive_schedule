@@ -26,12 +26,12 @@ nav {
     display: grid;
     justify-content: space-between;
     align-content: space-around;
-    grid-template-areas: "bottom-left bottom-right";
+    grid-template-areas: "bottom-left live bottom-right";
     grid-template-rows: auto;
-    grid-template-columns: auto auto;
+    grid-template-columns: auto auto auto;
 }
 
-@include class-grid("bottom-left", "bottom-right");
+@include class-grid("bottom-left", "bottom-right", "live");
 
 button {
     border: none;
@@ -41,4 +41,9 @@ button {
     &:disabled {
         cursor: initial;
     }
+}
+
+.live {
+    color: #ffffff;
+    padding-top: 0.5em;
 }

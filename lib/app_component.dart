@@ -1,49 +1,38 @@
-import 'dart:html';
-
 import 'package:angular/angular.dart';
+import 'package:angular_bloc/angular_bloc.dart';
 import 'package:angular_router/angular_router.dart';
 
+import 'src/blocs/app_bloc.dart';
 import 'src/routing.dart';
+import 'src/services/reset_confirm_service.dart';
+import 'src/services/state_serialization.dart';
 
 @Component(
   selector: "bd-app",
   templateUrl: "app_component.html",
   styleUrls: ["app_component.css"],
   directives: [routerDirectives],
+  pipes: [BlocPipe],
+  providers: [
+    ClassProvider(AppBloc),
+    ClassProvider(ResetConfirmService),
+    ClassProvider(StateSerializationService),
+  ],
   exports: [Routes],
 )
-class AppComponent {
+class AppComponent implements OnInit {
+  final AppBloc bloc;
   final Router _router;
-  AppComponent(this._router);
+  AppComponent(this.bloc, this._router);
 
-  int get currentPage => _router.current?.routePath?.additionalData ?? 0;
-
-  bool get canAdvance {
-    if (_router.current == null) {
-      return false;
-    }
-    return _router.current.routePath.additionalData < Routes.routes.length;
+  @override
+  void ngOnInit() {
+    bloc.state.listen((state) {
+      _router.navigate("/${state.page}");
+    });
   }
 
-  void advance() {
-    _router.navigate("/${currentPage + 1}");
-  }
-
-  bool get canRegress {
-    if (_router.current == null) {
-      return false;
-    }
-    return _router.current.routePath.additionalData > 1;
-  }
-
-  void regress() {
-    _router.navigate("/${currentPage - 1}");
-  }
-
-  void reset() {
-    if (window
-        .confirm("Start over from the beginning and lose all progress?")) {
-      _router.navigate("/1");
-    }
-  }
+  void advance() => bloc.dispatch(AdvanceEvent());
+  void regress() => bloc.dispatch(RegressEvent());
+  void reset() => bloc.dispatch(ResetEvent());
 }

@@ -5,16 +5,16 @@
 
     <nav>
         <span class="bottom-right">
-            <button class="next" [disabled]="!canAdvance" (click)="advance()">
+            <button class="next" [disabled]="!(bloc | bloc).canAdvance" (click)="advance()">
                 <span class="sr-only">Next</span>
-                <i class="material-icons md-36 md-light" [class.md-inactive]="!canAdvance"
+                <i class="material-icons md-36 md-light" [class.md-inactive]="!(bloc | bloc).canAdvance"
                     aria-hidden="true">chevron_right</i>
             </button>
         </span>
         <span class="bottom-left">
-            <button class="back" [disabled]="!canRegress" (click)="regress()">
+            <button class="back" [disabled]="!(bloc | bloc).canRegress" (click)="regress()">
                 <span class="sr-only">Back</span>
-                <i class="material-icons md-36 md-light" [class.md-inactive]="!canRegress"
+                <i class="material-icons md-36 md-light" [class.md-inactive]="!(bloc | bloc).canRegress"
                     aria-hidden="true">chevron_left</i>
             </button>
             <button class="reset" (click)="reset()">
@@ -22,6 +22,6 @@
                 <i class="material-icons md-36 md-light" aria-hidden="true">refresh</i>
             </button>
         </span>
-        <span class="live sr-only" innerHtml="Page {{currentPage + 1}}" aria-live="assertive"></span>
+        <span class="live" innerHtml="Page {{(bloc | bloc).page}}" aria-live="assertive"></span>
     </nav>
 </div>
