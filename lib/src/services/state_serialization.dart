@@ -10,8 +10,6 @@ class StateSerializationService {
   AppState loadState() {
     var serialized = window.localStorage[_stateKey];
     if (serialized == null) {
-      print("no state to load");
-      print(StackTrace.current);
       return null;
     } else {
       return serializers.deserializeWith(
