@@ -17,7 +17,6 @@ abstract class AppState implements Built<AppState, AppStateBuilder> {
   bool get canRegress;
 
   bool get processing;
-  @nullable
   String get processingBlurb;
 
   bool get serializeState;
@@ -50,6 +49,7 @@ void initialAppState(AppStateBuilder b) => b
   ..canAdvance = true
   ..canRegress = false
   ..processing = false
+  ..processingBlurb = ""
   ..serializeState = true
   ..input.update((b) => b);
 
@@ -63,6 +63,11 @@ class UpdateEvent implements AppEvent {
 class AdvanceEvent implements AppEvent {}
 
 class RegressEvent implements AppEvent {}
+
+class JumpEvent implements AppEvent {
+  final int page;
+  JumpEvent(this.page);
+}
 
 class ResetEvent implements AppEvent {}
 
@@ -99,6 +104,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           ..canAdvance = canAdvance(previousState.page + 1, previousState.input)
           ..canRegress = canRegress(previousState.page + 1, previousState.input)
           ..processing = false
+          ..processingBlurb = ""
           ..serializeState = true);
       }
 
@@ -110,8 +116,19 @@ class AppBloc extends Bloc<AppEvent, AppState> {
           ..canAdvance = canAdvance(previousState.page - 1, previousState.input)
           ..canRegress = canRegress(previousState.page - 1, previousState.input)
           ..processing = false
+          ..processingBlurb = ""
           ..serializeState = true);
       }
+
+      //
+    } else if (event is JumpEvent) {
+      yield previousState.rebuild((b) => b
+        ..page = event.page
+        ..canAdvance = canAdvance(event.page, previousState.input)
+        ..canRegress = canRegress(event.page, previousState.input)
+        ..processing = false
+        ..processingBlurb = ""
+        ..serializeState = true);
 
       //
     } else if (event is ResetEvent) {

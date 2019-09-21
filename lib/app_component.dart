@@ -31,6 +31,10 @@ class AppComponent implements OnInit {
     bloc.state.listen((state) {
       _router.navigate("/${state.page}");
     });
+    _router.onRouteActivated.listen((route) {
+      print("route activated: $route");
+      bloc.dispatch(JumpEvent(route.routePath.additionalData));
+    });
   }
 
   void advance() => bloc.dispatch(AdvanceEvent());
