@@ -1,12 +1,9 @@
 import 'package:angular/angular.dart';
 
-import '../pwa_prompt/pwa_prompt.dart';
-
 @Component(
   selector: "bd-page1",
   templateUrl: "page1.html",
   styleUrls: ["pages.css"],
-  directives: [PwaPrompt],
 )
 class Page1 {}
 

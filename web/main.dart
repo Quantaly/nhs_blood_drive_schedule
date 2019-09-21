@@ -11,8 +11,8 @@ import 'main.template.dart' as self;
 final InjectorFactory injector = self.injector$Injector;
 
 void main() {
-  if (sw.isSupported) {
+  /*if (sw.isSupported) {
     sw.register("sw.dart.js");
-  }
+  }*/
   runApp(ng.AppComponentNgFactory, createInjector: injector);
 }

@@ -3,6 +3,7 @@ import 'package:angular_bloc/angular_bloc.dart';
 import 'package:angular_router/angular_router.dart';
 
 import 'src/blocs/app_bloc.dart';
+import 'src/components/pwa_prompt/pwa_prompt.dart';
 import 'src/routing.dart';
 import 'src/services/reset_confirm_service.dart';
 import 'src/services/state_serialization.dart';
@@ -11,7 +12,7 @@ import 'src/services/state_serialization.dart';
   selector: "bd-app",
   templateUrl: "app_component.html",
   styleUrls: ["app_component.css"],
-  directives: [routerDirectives],
+  directives: [routerDirectives, PwaPrompt],
   pipes: [BlocPipe],
   providers: [
     ClassProvider(AppBloc),

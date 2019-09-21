@@ -1,6 +1,6 @@
 {
-    "short_name": "D",
-    "name": "DD",
+    "short_name": "Scheduler",
+    "name": "Blood Drive Scheduler",
     "icons": [
         {
             "src": "icons/icon-192.png",
