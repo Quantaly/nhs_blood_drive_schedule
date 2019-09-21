@@ -1,0 +1,35 @@
+@import "../../../shared";
+
+$button-size: 50px;
+$border-width: 3px;
+
+.outermost {
+    margin: 1em;
+    border: $border-width double;
+    display: grid;
+
+    grid-template-areas: "title toggle";
+    grid-template-rows: $button-size;
+    grid-template-columns: auto $button-size;
+
+    &.full {
+        grid-template-areas: "title toggle"
+                             "list list";
+        grid-template-rows: $button-size
+                            auto;
+        grid-template-columns: auto $button-size;
+    }
+}
+
+@include class-grid("title", "toggle", "list");
+
+.title {
+    margin: 0;
+    padding: 0.5em;
+}
+
+.toggle {
+    border: none;
+    background: inherit;
+    cursor: pointer;
+}

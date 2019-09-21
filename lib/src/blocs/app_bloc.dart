@@ -141,7 +141,6 @@ class AppBloc extends Bloc<AppEvent, AppState> {
   @override
   void onTransition(Transition<AppEvent, AppState> transition) {
     super.onTransition(transition);
-    print(transition);
     if (transition.nextState.serializeState) {
       _serializer.saveState(transition.nextState);
     }

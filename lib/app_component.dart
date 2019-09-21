@@ -32,7 +32,6 @@ class AppComponent implements OnInit {
       _router.navigate("/${state.page}");
     });
     _router.onRouteActivated.listen((route) {
-      print("route activated: $route");
       bloc.dispatch(JumpEvent(route.routePath.additionalData));
     });
   }

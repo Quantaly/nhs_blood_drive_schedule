@@ -1,0 +1,10 @@
+<div class="outermost" [class.full]="expanded">
+    <h2 class="title" [innerHtml]="name"></h2>
+    <button class="toggle" (click)="expanded = !expanded">
+        <span class="sr-only" [innerHtml]="buttonHint"></span>
+        <i class="material-icons md-dark" aria-hidden="true" [innerHtml]="icon"></i>
+    </button>
+    <ol *ngIf="expanded" class="list">
+        <li *ngFor="let step of steps" [innerHtml]="step"></li>
+    </ol>
+</div>
