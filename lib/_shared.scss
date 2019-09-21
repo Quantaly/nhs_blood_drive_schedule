@@ -1,0 +1,14 @@
+@mixin no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+@mixin class-grid($classes...) {
+    @each $class in $classes {
+        .#{$class} {
+            grid-area: #{$class};
+        }
+    }
+}

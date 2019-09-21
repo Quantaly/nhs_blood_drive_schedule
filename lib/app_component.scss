@@ -1,3 +1,32 @@
-:host {
-    /* This is equivalent of the 'body' selector of a page. */
+@import "shared";
+
+.outermost {
+    width: 100%;
+    height: 100%;
+
+    display: grid;
+    grid-template-rows: auto
+                        48px;
+    grid-template-columns: auto;
+}
+
+nav {
+    @include no-select;
+
+    background-color: #3e1601;
+
+    display: grid;
+    justify-content: space-between;
+    align-content: space-around;
+    grid-template-areas: "bottom-left bottom-right";
+    grid-template-rows: auto;
+    grid-template-columns: auto auto;
+}
+
+@include class-grid("bottom-left", "bottom-right");
+
+button {
+    border: none;
+    background: inherit;
+    cursor: pointer;
 }
