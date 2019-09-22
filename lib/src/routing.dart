@@ -10,6 +10,9 @@ class Routes {
     pages.Page3NgFactory,
     pages.Page4NgFactory,
     pages.Page5NgFactory,
+    pages.Page6NgFactory,
+    pages.Page7NgFactory,
+    pages.Page8NgFactory,
   ];
 
   static final routes = [

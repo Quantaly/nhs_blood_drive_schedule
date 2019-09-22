@@ -1,0 +1,51 @@
+<h1>Prioritize classes</h1>
+
+<p>Students will be pulled from classes in the order specified here.</p>
+
+<ul>
+    <li>Priority 1 is for classes we <strong>want to</strong> pull from; i.e. PBL skills, office worker</li>
+    <li>Priority 2 is for classes we <strong>can</strong> pull from; i.e. electives</li>
+    <li>Priority 3 is for classes we <strong>want to not</strong> pull from; i.e. math, cohort</li>
+    <li>Priority X is for classes we <strong>physically cannot</strong> pull from; i.e. internships</li>
+</ul>
+
+<table>
+    <thead>
+        <tr>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+            <td>X</td>
+            <td>Class</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let entry of state.input.classPriorityMap.entries">
+            <td>
+                <label>
+                    <span class="sr-only">{{entry.key}} is priority 1</span>
+                    <input type="radio" [checked]="entry.value == 1" (input)="prioritize(entry.key, 1)">
+                </label>
+            </td>
+            <td>
+                <label>
+                    <span class="sr-only">{{entry.key}} is priority 2</span>
+                    <input type="radio" [checked]="entry.value == 2" (input)="prioritize(entry.key, 2)">
+                </label>
+            </td>
+            <td>
+                <label>
+                    <span class="sr-only">{{entry.key}} is priority 3</span>
+                    <input type="radio" [checked]="entry.value == 3" (input)="prioritize(entry.key, 3)">
+                </label>
+            </td>
+            <td>
+                <label>
+                    <span class="sr-only">{{entry.key}} is priority X</span>
+                    <input type="radio" [checked]="entry.value == -1" (input)="prioritize(entry.key, -1)">
+                </label>
+            </td>
+            <td>{{entry.key}}</td>
+        </tr>
+    </tbody>
+</table>

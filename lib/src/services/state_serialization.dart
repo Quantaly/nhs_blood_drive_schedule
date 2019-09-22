@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:html';
 import 'dart:indexed_db';
@@ -10,6 +11,7 @@ class StateSerializationService {
   static const _dbName = "bd-database";
   static const _schedulesKey = "bd-schedules";
   static const _signupsKey = "bd-signups";
+  static const _classPrioritiesKey = "bd-classPriorities";
 
   Future<Database> _dbFuture = _open();
 
@@ -59,6 +61,75 @@ class StateSerializationService {
     ]);
   }
 
+  Future<Set<String>> getApplicableClasses(Set<String> periods) async {
+    var db = await _dbFuture;
+    var txn = db.transaction([_schedulesKey, _signupsKey], "readonly");
+    var schedulesStore = txn.objectStore(_schedulesKey);
+    var signupsStore = txn.objectStore(_signupsKey);
+
+    Set<int> signupIds = (await _requestToFuture(
+                signupsStore.index("id").getAll(KeyRange.lowerBound(1111111)))
+            as List)
+        .cast<Map>()
+        .map((m) => m["id"] as int)
+        .toSet();
+
+    Set<String> ret = {};
+    await for (var cursor in schedulesStore.openCursor()) {
+      var val = (cursor.value as Map).cast<String, Object>();
+      if (signupIds.contains(val["id"]) && periods.contains(val["period"])) {
+        ret.add(val["class"]);
+      }
+      cursor.next();
+    }
+
+    print("getApplicableClasses: $ret");
+    return ret;
+  }
+
+  Future<Map<String, int>> getClassPriorities(Iterable<String> classes,
+      {int defaultPriority}) async {
+    var db = await _dbFuture;
+    var prioritiesStore = db
+        .transaction(_classPrioritiesKey, "readonly")
+        .objectStore(_classPrioritiesKey);
+    Map<String, int> ret = {};
+    await Future.wait([
+      for (var clazz in classes)
+        prioritiesStore
+            .getObject(clazz)
+            .then((pri) => ret[clazz] = pri ?? defaultPriority)
+    ]);
+    return ret;
+  }
+
+  Future<void> saveClassPriorities(Map<String, int> priorities) async {
+    var db = await _dbFuture;
+    var prioritiesStore = db
+        .transaction(_classPrioritiesKey, "readwrite")
+        .objectStore(_classPrioritiesKey);
+    await Future.wait([
+      for (var entry in priorities.entries)
+        prioritiesStore.put(entry.value, entry.key)
+    ]);
+  }
+
+  static Future _requestToFuture(Request request) {
+    Completer ret = Completer();
+    StreamSubscription valSub, errSub;
+    valSub = request.onSuccess.listen((_) {
+      valSub.cancel();
+      errSub.cancel();
+      ret.complete(request.result);
+    });
+    errSub = request.onError.listen((_) {
+      valSub.cancel();
+      errSub.cancel();
+      ret.completeError(request.error);
+    });
+    return ret.future;
+  }
+
   static Future<Database> _open() => window.indexedDB.open(
         _dbName,
         version: 1,
@@ -76,6 +147,7 @@ class StateSerializationService {
                 var signupsStore =
                     db.createObjectStore(_signupsKey, autoIncrement: true);
                 signupsStore.createIndex("id", "id");
+                db.createObjectStore(_classPrioritiesKey);
                 break;
 
               default:

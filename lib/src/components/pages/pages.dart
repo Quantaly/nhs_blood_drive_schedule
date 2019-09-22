@@ -201,3 +201,33 @@ class Page5 implements OnInit {
   void toggle8() => bloc.dispatch(UpdateEvent(
       (b) => b.availablePeriods.p8 = !state.input.availablePeriods.p8));
 }
+
+@Component(
+  selector: "bd-page6",
+  templateUrl: "page6.html",
+  styleUrls: ["pages.css"],
+  directives: [coreDirectives],
+)
+class Page6 {
+  AppBloc bloc;
+  Page6(this.bloc);
+
+  AppState get state => bloc.currentState;
+
+  void prioritize(String key, int value) =>
+      bloc.dispatch(UpdateEvent((b) => b.classPriorityMap[key] = value));
+}
+
+@Component(
+  selector: "bd-page7",
+  templateUrl: "page7.html",
+  styleUrls: ["pages.css"],
+)
+class Page7 {}
+
+@Component(
+  selector: "bd-page8",
+  templateUrl: "page8.html",
+  styleUrls: ["pages.css"],
+)
+class Page8 {}

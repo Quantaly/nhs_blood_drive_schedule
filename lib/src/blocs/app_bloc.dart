@@ -1,139 +1,14 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:built_value/built_value.dart';
-import 'package:built_value/serializer.dart';
 
 import '../services/reset_confirm_service.dart';
 import '../services/state_serialization.dart';
+import 'app_events.dart';
+import 'app_states.dart';
 
-part 'app_bloc.g.dart';
-
-abstract class AppState implements Built<AppState, AppStateBuilder> {
-  static Serializer<AppState> get serializer => _$appStateSerializer;
-
-  int get page;
-  bool get canAdvance;
-  bool get canRegress;
-
-  bool get processing;
-  String get processingBlurb;
-
-  bool get serializeState;
-
-  AppInput get input;
-
-  AppState._();
-  factory AppState([void Function(AppStateBuilder) updates]) = _$AppState;
-}
-
-abstract class AppInput implements Built<AppInput, AppInputBuilder> {
-  static Serializer<AppInput> get serializer => _$appInputSerializer;
-
-  // page 3
-  @nullable
-  @BuiltValueField(serialize: false)
-  CsvImportStatus get scheduleCsv;
-  bool get hasIndexedSchedule;
-
-  // page 4
-  @nullable
-  @BuiltValueField(serialize: false)
-  CsvImportStatus get signupCsv;
-  bool get hasIndexedSignup;
-
-  // page 5
-  PeriodSet get availablePeriods;
-
-  AppInput._();
-  factory AppInput([void Function(AppInputBuilder) updates]) = _$AppInput;
-}
-
-abstract class CsvImportStatus
-    implements Built<CsvImportStatus, CsvImportStatusBuilder> {
-  List<List<Object>> get csvContent;
-
-  @nullable
-  List<String> get headers;
-
-  @nullable
-  int get idCol;
-
-  @nullable
-  int get classCol;
-
-  @nullable
-  int get periodCol;
-
-  CsvImportStatus._();
-  factory CsvImportStatus([void Function(CsvImportStatusBuilder) updates]) =
-      _$CsvImportStatus;
-}
-
-abstract class PeriodSet implements Built<PeriodSet, PeriodSetBuilder> {
-  static Serializer<PeriodSet> get serializer => _$periodSetSerializer;
-
-  bool get p1;
-  bool get p2;
-  bool get p3;
-  bool get p4;
-  bool get p5;
-  bool get p6;
-  bool get p7;
-  bool get p8;
-
-  Set<String> toStringSet() => {
-        if (p1) "P1",
-        if (p2) "P2",
-        if (p3) "P3",
-        if (p4) "P4",
-        if (p5) "P5",
-        if (p6) "P6",
-        if (p7) "P7",
-        if (p8) "P8",
-      };
-
-  PeriodSet._();
-  factory PeriodSet([void Function(PeriodSetBuilder) updates]) = _$PeriodSet;
-}
-
-void initialAppState(AppStateBuilder b) => b
-  ..page = 1
-  ..canAdvance = true
-  ..canRegress = false
-  ..processing = false
-  ..processingBlurb = ""
-  ..serializeState = true
-  ..input.update((b) => b
-    ..hasIndexedSchedule = false
-    ..hasIndexedSignup = false
-    ..availablePeriods.update((b) => b
-      ..p1 = false
-      ..p2 = false
-      ..p3 = false
-      ..p4 = false
-      ..p5 = false
-      ..p6 = false
-      ..p7 = false
-      ..p8 = false));
-
-abstract class AppEvent {}
-
-class UpdateEvent implements AppEvent {
-  final void Function(AppInputBuilder) updates;
-  UpdateEvent(this.updates);
-}
-
-class AdvanceEvent implements AppEvent {}
-
-class RegressEvent implements AppEvent {}
-
-class JumpEvent implements AppEvent {
-  final int page;
-  JumpEvent(this.page);
-}
-
-class ResetEvent implements AppEvent {}
+export 'app_events.dart';
+export 'app_states.dart';
 
 class AppBloc extends Bloc<AppEvent, AppState> {
   final StateSerializationService _serializer;
@@ -200,7 +75,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             if (newInput.scheduleCsv != null) {
               yield previousState.rebuild((b) => b
                 ..processing = true
-                ..processingBlurb = "Indexing (this may take some time)..."
+                ..processingBlurb = "Indexing..."
                 ..serializeState = false);
               var csvTable = newInput.scheduleCsv.csvContent;
               await _serializer.indexSchedules(
@@ -218,7 +93,7 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             if (newInput.signupCsv != null) {
               yield previousState.rebuild((b) => b
                 ..processing = true
-                ..processingBlurb = "Indexing (this may take some time)..."
+                ..processingBlurb = "Indexing..."
                 ..serializeState = false);
               var csvTable = newInput.signupCsv.csvContent;
               await _serializer.indexSignups(
@@ -227,6 +102,29 @@ class AppBloc extends Bloc<AppEvent, AppState> {
                 ..signupCsv = null
                 ..hasIndexedSignup = true);
             }
+            break;
+
+          case 5:
+            yield previousState.rebuild((b) => b
+              ..processing = true
+              ..processingBlurb = "Filtering..."
+              ..serializeState = false);
+            var classes = await _serializer
+                .getApplicableClasses(newInput.availablePeriods.toStringSet());
+            var priorityMap = await _serializer.getClassPriorities(classes,
+                defaultPriority: 1);
+            newInput = newInput.rebuild((b) => b.classPriorityMap
+              ..clear()
+              ..addAll(priorityMap));
+            break;
+
+          case 6:
+            yield previousState.rebuild((b) => b
+              ..processing = true
+              ..processingBlurb = "Updating..."
+              ..serializeState = false);
+            await _serializer
+                .saveClassPriorities(newInput.classPriorityMap.asMap());
             break;
         }
 
@@ -294,6 +192,8 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return input.hasIndexedSignup || input.signupCsv != null;
       case 5:
         return input.availablePeriods.toStringSet().isNotEmpty;
+      case 6:
+        return true;
       default:
         return false;
     }
