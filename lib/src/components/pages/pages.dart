@@ -1,8 +1,8 @@
 import 'dart:html';
 
 import 'package:angular/angular.dart';
+import 'package:angular/security.dart';
 import 'package:csv/csv.dart';
-import 'package:quiver/iterables.dart';
 
 import '../../blocs/app_bloc.dart';
 import '../explainer/explainer.dart';
@@ -230,4 +230,11 @@ class Page7 {}
   templateUrl: "page8.html",
   styleUrls: ["pages.css"],
 )
-class Page8 {}
+class Page8 {
+  final AppBloc bloc;
+  final DomSanitizationService sanitizer;
+  Page8(this.bloc, this.sanitizer);
+
+  Object get dataUrl =>
+      sanitizer.bypassSecurityTrustUrl(bloc.currentState.finalOutputDataUrl);
+}

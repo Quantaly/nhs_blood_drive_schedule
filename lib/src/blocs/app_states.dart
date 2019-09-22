@@ -18,6 +18,8 @@ abstract class AppState implements Built<AppState, AppStateBuilder> {
 
   AppInput get input;
 
+  String get finalOutputDataUrl;
+
   AppState._();
   factory AppState([void Function(AppStateBuilder) updates]) = _$AppState;
 }
@@ -114,4 +116,5 @@ void initialAppState(AppStateBuilder b) => b
       ..p6 = false
       ..p7 = false
       ..p8 = false)
-    ..classPriorityMap.clear());
+    ..classPriorityMap.clear())
+  ..finalOutputDataUrl = "";

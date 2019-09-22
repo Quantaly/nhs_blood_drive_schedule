@@ -71,7 +71,8 @@ class StateSerializationService {
                 signupsStore.index("id").getAll(KeyRange.lowerBound(1111111)))
             as List)
         .cast<Map>()
-        .map((m) => m["id"] as int)
+        .map((m) => m["id"])
+        .whereType<int>()
         .toSet();
 
     Set<String> ret = {};
@@ -103,6 +104,14 @@ class StateSerializationService {
     return ret;
   }
 
+  Future<int> getPriorityForClass(String clazz, {int defaultPriority}) async {
+    var db = await _dbFuture;
+    var prioritiesStore = db
+        .transaction(_classPrioritiesKey, "readonly")
+        .objectStore(_classPrioritiesKey);
+    return await prioritiesStore.getObject(clazz) ?? defaultPriority;
+  }
+
   Future<void> saveClassPriorities(Map<String, int> priorities) async {
     var db = await _dbFuture;
     var prioritiesStore = db
@@ -111,6 +120,53 @@ class StateSerializationService {
     await Future.wait([
       for (var entry in priorities.entries)
         prioritiesStore.put(entry.value, entry.key)
+    ]);
+  }
+
+  Future<Map<int, Set<StructuredSchedule>>> loadSchedulesForSignups() async {
+    var db = await _dbFuture;
+    var txn = db.transaction([_schedulesKey, _signupsKey], "readonly");
+    var schedulesStore = txn.objectStore(_schedulesKey);
+    var signupsStore = txn.objectStore(_signupsKey);
+
+    Set<int> signupIds = (await _requestToFuture(
+                signupsStore.index("id").getAll(KeyRange.lowerBound(1111111)))
+            as List)
+        .cast<Map>()
+        .map((m) => m["id"])
+        .whereType<int>()
+        .toSet();
+
+    Map<int, Set<StructuredSchedule>> ret = {};
+    for (var id in signupIds) {
+      Set<StructuredSchedule> schedules = {};
+      await for (var cursor in schedulesStore.index("id").openCursor(key: id)) {
+        Map value = cursor.value;
+        schedules.add(StructuredSchedule(
+            id: value["id"],
+            clazz: value["class"],
+            period: value["period"],
+            rawCsv: value["rawCsv"]));
+        cursor.next();
+      }
+      ret[id] = schedules;
+    }
+
+    return ret;
+  }
+
+  // only class priorities should persist
+  Future<void> clearSession() async {
+    window.localStorage.remove(_stateKey);
+
+    var db = await _dbFuture;
+    var txn = db.transaction([_schedulesKey, _signupsKey], "readwrite");
+    var schedulesStore = txn.objectStore(_schedulesKey);
+    var signupsStore = txn.objectStore(_signupsKey);
+
+    await Future.wait([
+      schedulesStore.clear(),
+      signupsStore.clear(),
     ]);
   }
 

@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:csv/csv.dart' as csv;
 
+import '../generate_schedule.dart';
 import '../services/reset_confirm_service.dart';
 import '../services/state_serialization.dart';
 import 'app_events.dart';
@@ -37,9 +39,9 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             newInput.scheduleCsv.csvContent[0].map((s) => "$s").toList();
         var idCol = orElse(headers.indexWhere((s) => s.contains("ID")), 0);
         var classCol =
-            orElse(headers.indexWhere((s) => s.contains("Class")), 3);
+            orElse(headers.indexWhere((s) => s.contains("Class")), 5);
         var periodCol = orElse(
-            headers.indexWhere((s) => s.contains("Period")), classCol + 1);
+            headers.indexWhere((s) => s.contains("Per")), classCol - 1);
         newInput = newInput.rebuild((b) => b
           ..scheduleCsv.update((b) => b
             ..headers = headers
@@ -126,6 +128,28 @@ class AppBloc extends Bloc<AppEvent, AppState> {
             await _serializer
                 .saveClassPriorities(newInput.classPriorityMap.asMap());
             break;
+
+          case 7:
+            yield previousState.rebuild((b) => b
+              ..processing = true
+              ..processingBlurb = "Generating..."
+              ..serializeState = false);
+            var generator = ScheduleGenerator(_serializer);
+            var table = await generator
+                .generateSchedule(newInput.availablePeriods.toStringSet());
+            var csvWriter = csv.ListToCsvConverter();
+            var dataUrl = "data:text/csv,"
+                "${Uri.encodeComponent(csvWriter.convert(table))}";
+            yield previousState.rebuild((b) => b
+              ..page = 8
+              ..canAdvance = false
+              ..canRegress = false
+              ..processing = false
+              ..processingBlurb = ""
+              ..serializeState = false
+              ..finalOutputDataUrl = dataUrl);
+            unawaited(_serializer.clearSession());
+            return;
         }
 
         yield previousState.rebuild((b) => b
@@ -152,13 +176,13 @@ class AppBloc extends Bloc<AppEvent, AppState> {
 
       //
     } else if (event is JumpEvent) {
-      yield previousState.rebuild((b) => b
+      /*yield previousState.rebuild((b) => b
         ..page = event.page
         ..canAdvance = canAdvance(event.page, previousState.input)
         ..canRegress = canRegress(event.page, previousState.input)
         ..processing = false
         ..processingBlurb = ""
-        ..serializeState = true);
+        ..serializeState = true);*/
 
       //
     } else if (event is ResetEvent) {
@@ -194,13 +218,18 @@ class AppBloc extends Bloc<AppEvent, AppState> {
         return input.availablePeriods.toStringSet().isNotEmpty;
       case 6:
         return true;
+      case 7:
+        return true;
       default:
         return false;
     }
   }
 
-  static bool canRegress(int page, AppInput input) => page > 1;
+  static bool canRegress(int page, AppInput input) => page > 1 && page < 8;
 
   static int orElse(int input, int defaultValue) =>
       input == -1 ? defaultValue : input;
 }
+
+// Importing pedantic is for suckers.
+void unawaited(Future f) {}
