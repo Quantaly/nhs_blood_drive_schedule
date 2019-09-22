@@ -1,5 +1,5 @@
 <div class="outermost">
-    <main>
+    <main [style.opacity]="state.processing ? 0.5 : 1">
         <router-outlet [routes]="Routes.routes"></router-outlet>
         <bd-pwa-prompt></bd-pwa-prompt>
     </main>
