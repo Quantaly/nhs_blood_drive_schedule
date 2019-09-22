@@ -1,3 +1,3 @@
 ## 1.0.0
-
-- Initial version, created by Stagehand
+- dangit why'd i spend my weekend doing this
+- i'd better get some mad volunteer hours
