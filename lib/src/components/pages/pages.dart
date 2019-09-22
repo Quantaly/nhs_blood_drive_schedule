@@ -2,6 +2,7 @@ import 'dart:html';
 
 import 'package:angular/angular.dart';
 import 'package:csv/csv.dart';
+import 'package:quiver/iterables.dart';
 
 import '../../blocs/app_bloc.dart';
 import '../explainer/explainer.dart';
@@ -110,6 +111,93 @@ class Page4 {
 @Component(
   selector: "bd-page5",
   templateUrl: "page5.html",
-  styleUrls: ["pages.css"]
+  styleUrls: ["pages.css"],
+  directives: [coreDirectives],
 )
-class Page5 {}
+class Page5 implements OnInit {
+  AppBloc bloc;
+  Page5(this.bloc);
+
+  AppState get state => bloc.currentState;
+
+  RadioButtonInputElement rCast(EventTarget t) => t as RadioButtonInputElement;
+
+  String _selected;
+  String get selected => _selected;
+  set selected(String value) {
+    _selected = value;
+    switch (value) {
+      case "odd":
+        bloc.dispatch(UpdateEvent((b) => b.availablePeriods
+          ..p1 = true
+          ..p3 = true
+          ..p5 = true
+          ..p7 = true
+          ..p2 = false
+          ..p4 = false
+          ..p6 = false
+          ..p8 = false));
+        break;
+      case "even":
+        bloc.dispatch(UpdateEvent((b) => b.availablePeriods
+          ..p2 = true
+          ..p4 = true
+          ..p6 = true
+          ..p8 = true
+          ..p1 = false
+          ..p3 = false
+          ..p5 = false
+          ..p7 = false));
+        break;
+      case "fri":
+        bloc.dispatch(UpdateEvent((b) => b.availablePeriods
+          ..p1 = true
+          ..p2 = true
+          ..p3 = true
+          ..p4 = true
+          ..p5 = true
+          ..p6 = true
+          ..p7 = true
+          ..p8 = true));
+        break;
+    }
+  }
+
+  @override
+  void ngOnInit() {
+    var p = state.input.availablePeriods;
+    if (p.p1 && p.p3 && p.p5 && p.p7 && !p.p2 && !p.p4 && !p.p6 && !p.p8) {
+      _selected = "odd";
+    } else if (p.p2 &&
+        p.p4 &&
+        p.p6 &&
+        p.p8 &&
+        !p.p1 &&
+        !p.p3 &&
+        !p.p5 &&
+        !p.p7) {
+      _selected = "even";
+    } else if (p.p1 && p.p2 && p.p3 && p.p4 && p.p5 && p.p6 && p.p7 && p.p8) {
+      _selected = "fri";
+    } else if (p.p1 || p.p2 || p.p3 || p.p4 || p.p5 || p.p6 || p.p7 || p.p8) {
+      _selected = "custom";
+    }
+  }
+
+  void toggle1() => bloc.dispatch(UpdateEvent(
+      (b) => b.availablePeriods.p1 = !state.input.availablePeriods.p1));
+  void toggle2() => bloc.dispatch(UpdateEvent(
+      (b) => b.availablePeriods.p2 = !state.input.availablePeriods.p2));
+  void toggle3() => bloc.dispatch(UpdateEvent(
+      (b) => b.availablePeriods.p3 = !state.input.availablePeriods.p3));
+  void toggle4() => bloc.dispatch(UpdateEvent(
+      (b) => b.availablePeriods.p4 = !state.input.availablePeriods.p4));
+  void toggle5() => bloc.dispatch(UpdateEvent(
+      (b) => b.availablePeriods.p5 = !state.input.availablePeriods.p5));
+  void toggle6() => bloc.dispatch(UpdateEvent(
+      (b) => b.availablePeriods.p6 = !state.input.availablePeriods.p6));
+  void toggle7() => bloc.dispatch(UpdateEvent(
+      (b) => b.availablePeriods.p7 = !state.input.availablePeriods.p7));
+  void toggle8() => bloc.dispatch(UpdateEvent(
+      (b) => b.availablePeriods.p8 = !state.input.availablePeriods.p8));
+}

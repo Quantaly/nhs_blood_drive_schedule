@@ -1,1 +1,70 @@
-<h1>do something im rly tired at this point i just need page 5 to exist man</h1>
+<h1>Select available periods</h1>
+
+<p>The blood drive will be happening on a(n)...</p>
+
+<div class="p5-form">
+    <div>
+        <label>
+            <strong class="day">Odd day</strong>
+            <span class="desc">Periods 1, 3, 5, 7</span>
+            <input class="button" type="radio" [checked]="selected == 'odd'" (input)="selected = 'odd'">
+        </label>
+    </div>
+    <div>
+        <label>
+            <strong class="day">Even day</strong>
+            <span class="desc">Periods 2, 4, 6, 8</span>
+            <input class="button" type="radio" [checked]="selected == 'even'" (input)="selected = 'even'">
+        </label>
+    </div>
+    <div>
+        <label>
+            <strong class="day">Friday</strong>
+            <span class="desc">Periods 1, 2, 3, 4, 5, 6, 7, 8</span>
+            <input class="button" type="radio" [checked]="selected == 'fri'" (input)="selected = 'fri'">
+        </label>
+    </div>
+    <div>
+        <label>
+            <strong class="day">Custom</strong>
+            <span class="desc">Additional options will appear below</span>
+            <input class="button" type="radio" [checked]="selected == 'custom'" (input)="selected = 'custom'">
+        </label>
+    </div>
+</div>
+
+<div class="p5-custom" *ngIf="selected == 'custom'">
+    <h2>Custom period selectors</h2>
+    <label>
+        P1
+        <input type="checkbox" [checked]="state.input.availablePeriods.p1" (input)="toggle1()">
+    </label>
+    <label>
+        P2
+        <input type="checkbox" [checked]="state.input.availablePeriods.p2" (input)="toggle2()">
+    </label>
+    <label>
+        P3
+        <input type="checkbox" [checked]="state.input.availablePeriods.p3" (input)="toggle3()">
+    </label>
+    <label>
+        P4
+        <input type="checkbox" [checked]="state.input.availablePeriods.p4" (input)="toggle4()">
+    </label>
+    <label>
+        P5
+        <input type="checkbox" [checked]="state.input.availablePeriods.p5" (input)="toggle5()">
+    </label>
+    <label>
+        P6
+        <input type="checkbox" [checked]="state.input.availablePeriods.p6" (input)="toggle6()">
+    </label>
+    <label>
+        P7
+        <input type="checkbox" [checked]="state.input.availablePeriods.p7" (input)="toggle7()">
+    </label>
+    <label>
+        P8
+        <input type="checkbox" [checked]="state.input.availablePeriods.p8" (input)="toggle8()">
+    </label>
+</div>

@@ -1,0 +1,31 @@
+@import "../../../shared";
+
+.p5-form {
+    div {
+        margin: 1em;
+    }
+    
+    label {
+        display: inline-grid;
+        gap: 0.25em;
+        grid-template-areas: "button day"
+                             "button desc";
+        grid-template-rows: auto
+                            auto;
+        grid-template-columns: auto auto;
+        align-content: space-around;
+    
+        @include class-grid("button", "day", "desc");
+    
+        input {
+            display: block;
+        }
+    }
+}
+
+.p5-custom {
+    label {
+        display: inline-block;
+        margin: 0 0.5em;
+    }
+}

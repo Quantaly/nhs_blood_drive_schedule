@@ -1,5 +1,4 @@
 import 'package:angular/angular.dart';
-import 'package:angular_bloc/angular_bloc.dart';
 import 'package:angular_router/angular_router.dart';
 
 import 'src/blocs/app_bloc.dart';
