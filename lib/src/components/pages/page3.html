@@ -1,0 +1,50 @@
+<h1>Import student schedules</h1>
+
+<p *ngIf="state.input.hasIndexedSchedule">
+    A schedule has already been indexed for this session. You may replace it if you desire.
+</p>
+
+<label>
+    Student schedules CSV:
+    <input #input type="file" accept=".csv" [disabled]="input.value?.isNotEmpty ?? false"
+        (input)="processImport(input.files.first)">
+</label>
+
+<template [ngIf]="displayProcessing">
+    <template [ngIf]="state.input.scheduleCsv == null">
+        <p>Processing...</p>
+    </template>
+</template>
+
+<div *ngIf="state.input.scheduleCsv != null">
+    <p>
+        <label>
+            ID column:
+            <select #idCol (input)="updateIdCol(idCol.value)">
+                <option *ngFor="let header of state.input.scheduleCsv.headers; let i=index" value="{{i}}"
+                    [selected]="state.input.scheduleCsv.idCol == i">{{header}}
+                </option>
+            </select>
+        </label>
+    </p>
+    <p>
+        <label>
+            Class column:
+            <select #classCol (input)="updateClassCol(classCol.value)">
+                <option *ngFor="let header of state.input.scheduleCsv.headers; let i=index" value="{{i}}"
+                    [selected]="state.input.scheduleCsv.classCol == i">{{header}}
+                </option>
+            </select>
+        </label>
+    </p>
+    <p>
+        <label>
+            Period column:
+            <select #periodCol (input)="updatePeriodCol(periodCol.value)">
+                <option *ngFor="let header of state.input.scheduleCsv.headers; let i=index" value="{{i}}"
+                    [selected]="state.input.scheduleCsv.periodCol == i">{{header}}
+                </option>
+            </select>
+        </label>
+    </p>
+</div>

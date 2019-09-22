@@ -13,7 +13,6 @@ import 'src/services/state_serialization.dart';
   templateUrl: "app_component.html",
   styleUrls: ["app_component.css"],
   directives: [routerDirectives, PwaPrompt],
-  pipes: [BlocPipe],
   providers: [
     ClassProvider(AppBloc),
     ClassProvider(ResetConfirmService),
@@ -26,13 +25,21 @@ class AppComponent implements OnInit {
   final Router _router;
   AppComponent(this.bloc, this._router);
 
+  String notification = "";
+  AppState get state => bloc.currentState;
+
   @override
   void ngOnInit() {
     bloc.state.listen((state) {
       _router.navigate("/${state.page}");
+      notification = state.processingBlurb.isNotEmpty
+          ? state.processingBlurb
+          : "Page ${state.page}";
     });
     _router.onRouteActivated.listen((route) {
-      bloc.dispatch(JumpEvent(route.routePath.additionalData));
+      if (route.routePath.additionalData != state.page) {
+        _router.navigate("/${state.page}");
+      };
     });
   }
 

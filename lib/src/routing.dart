@@ -6,7 +6,10 @@ import 'components/pages/pages.template.dart' as pages;
 class Routes {
   static final templates = <ComponentFactory>[
     pages.Page1NgFactory,
-    pages.Page2NgFactory
+    pages.Page2NgFactory,
+    pages.Page3NgFactory,
+    pages.Page4NgFactory,
+    pages.Page5NgFactory,
   ];
 
   static final routes = [
